@@ -36,6 +36,8 @@ provider:
   endpointType: regional
   environment:
     NOTES_TABLE: ${self:service}-${opt:stage, self:provider.stage}
+    COGNITO_IDENTITY_POOL_ID: us-east-1:e2860d3a-20d3-453e-ba15-2aebc2e8c453
+
   iamRoleStatements:
     - Effect: Allow
       Action: 
@@ -46,6 +48,17 @@ provider:
 
 
 functions:
+  authenticate-google:
+    handler: api/authenticate-google.handler
+    description: Google IDP Authentication
+    events:
+      - http:
+          path: auth
+          method: get
+          cors:
+            origin: '*'
+            headers: ${self:custom.allowedHeaders}
+          
   add-note:
     handler: api/add-note.handler
     description: POST/note
@@ -53,6 +66,7 @@ functions:
       - http:
           path: note
           method: post
+          authorizer: aws_iam
           cors:
             origin: '*'
             headers: ${self:custom.allowedHeaders}
@@ -63,6 +77,7 @@ functions:
     events:
       - http:
           path: note
+          authorizer: aws_iam          
           method: patch
           cors:
             origin: '*'
@@ -75,6 +90,7 @@ functions:
       - http:
           path: notes
           method: get
+          authorizer: aws_iam
           cors:
             origin: '*'
             headers: ${self:custom.allowedHeaders}
@@ -86,6 +102,7 @@ functions:
       - http:
           path: note/n/{note_id}
           method: get
+          authorizer: aws_iam
           cors:
             origin: '*'
             headers: ${self:custom.allowedHeaders}
@@ -97,6 +114,7 @@ functions:
       - http:
           path: note/t/{timestamp}
           method: delete
+          authorizer: aws_iam
           cors:
             origin: '*'
             headers: ${self:custom.allowedHeaders}
@@ -138,3 +156,13 @@ resources:
               ReadCapacityUnits: 1
               WriteCapacityUnits: 1
             
+
+    GatewayResponseDefault4XX: ## YOU CAN ADD SIMILAR SECTION FOR 5XX ERRORS IF DESIRED
+      Type: AWS::ApiGateway::GatewayResponse
+      Properties:
+        ResponseParameters:
+          gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+          gatewayresponse.header.Access-Control-Allow-Headers: "'*'"
+        ResponseType: DEFAULT_4XX
+        RestApiId:
+          Ref: 'ApiGatewayRestApi'
