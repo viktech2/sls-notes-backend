@@ -36,7 +36,7 @@ provider:
   endpointType: regional
   environment:
     NOTES_TABLE: ${self:service}-${opt:stage, self:provider.stage}
-    COGNITO_IDENTITY_POOL_ID: us-east-1:e2860d3a-20d3-453e-ba15-2aebc2e8c453
+    COGNITO_IDENTITY_POOL_ID: XXXXXXX
 
   iamRoleStatements:
     - Effect: Allow
@@ -66,7 +66,7 @@ functions:
       - http:
           path: note
           method: post
-          authorizer: aws_iam
+          # authorizer: aws_iam
           cors:
             origin: '*'
             headers: ${self:custom.allowedHeaders}
@@ -77,7 +77,7 @@ functions:
     events:
       - http:
           path: note
-          authorizer: aws_iam          
+          # authorizer: aws_iam  
           method: patch
           cors:
             origin: '*'
@@ -90,7 +90,7 @@ functions:
       - http:
           path: notes
           method: get
-          authorizer: aws_iam
+          # authorizer: aws_iam
           cors:
             origin: '*'
             headers: ${self:custom.allowedHeaders}
@@ -102,7 +102,7 @@ functions:
       - http:
           path: note/n/{note_id}
           method: get
-          authorizer: aws_iam
+          # authorizer: aws_iam
           cors:
             origin: '*'
             headers: ${self:custom.allowedHeaders}
@@ -114,7 +114,7 @@ functions:
       - http:
           path: note/t/{timestamp}
           method: delete
-          authorizer: aws_iam
+          # authorizer: aws_iam
           cors:
             origin: '*'
             headers: ${self:custom.allowedHeaders}
